@@ -23,7 +23,7 @@ def proxy_descriptor_xml() -> str:
         <APIProxy revision="1" name="{PROXY_NAME}">
             <DisplayName>{PROXY_NAME}</DisplayName>
             <Description>Demo API Proxy deployed via GitHub Actions</Description>
-            <BasePaths>/proxy-demo-1</BasePaths>
+            <BasePath>/proxy-demo-1</BasePath>
             <Policies>
                 <Policy>AM-SetCORSHeaders</Policy>
                 <Policy>RF-InvalidRequest</Policy>

@@ -79,13 +79,13 @@ def target_endpoint_xml() -> str:
 
 def quota_policy_xml() -> str:
     """Quota policy: apiproxy/policies/Quota-Default.xml
-    Configured for 3 calls per 1 minute.
+    Configured for 4 calls per 1 minute.
     """
     return textwrap.dedent("""\
         <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
         <Quota name="Quota-Default" continueOnError="false" enabled="true">
             <DisplayName>Quota-Default</DisplayName>
-            <Allow count="3"/>
+            <Allow count="4"/>
             <Interval>1</Interval>
             <TimeUnit>minute</TimeUnit>
             <Distributed>true</Distributed>

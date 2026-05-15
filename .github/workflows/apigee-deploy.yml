@@ -49,17 +49,22 @@ jobs:
         run: |
           echo "==> Running create_structure.py …"
           python scripts/create_structure.py ${{ env.BUNDLE_DIR }}
-
+          
       - name: Verify folder tree
         run: |
           echo "==> Scaffolded structure:"
-          find ${{ env.BUNDLE_DIR }} -type d | sort
+          if [ ! -d "${{ env.BUNDLE_DIR }}" ]; then
+            echo "❌ ERROR: ${{ env.BUNDLE_DIR }} directory not created!"
+            exit 1
+          fi
+          find ${{ env.BUNDLE_DIR }} -type f | sort || echo "  (empty)"
 
       - name: Upload scaffolded tree as artifact
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: scaffolded-tree
-          path: ${{ env.BUNDLE_DIR }}/
+          path: ${{ env.BUNDLE_DIR }}
           retention-days: 1
 
 
@@ -82,7 +87,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: scaffolded-tree
-          path: ${{ env.BUNDLE_DIR }}/
+          path: ./
+
+      - name: Verify downloaded structure
+        run: |
+          echo "==> Downloaded artifact structure:"
+          find . -type f -name "*.xml" 2>/dev/null | head -20 || echo "  (no files found)"
+          ls -la
 
       - name: Generate XML configuration files
         run: |
@@ -95,15 +106,21 @@ jobs:
           find ${{ env.BUNDLE_DIR }} -name "*.xml" | sort
           echo ""
           echo "==> Contents of root descriptor:"
-          cat ${{ env.BUNDLE_DIR }}/apiproxy/${{ env.PROXY_NAME }}.xml
+          if [ -f "${{ env.BUNDLE_DIR }}/apiproxy/${{ env.PROXY_NAME }}.xml" ]; then
+            cat "${{ env.BUNDLE_DIR }}/apiproxy/${{ env.PROXY_NAME }}.xml"
+          else
+            echo "❌ ERROR: Root descriptor not found!"
+            find ${{ env.BUNDLE_DIR }} -type f
+            exit 1
+          fi
 
       - name: Upload proxy bundle source
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: proxy-bundle-src
-          path: ${{ env.BUNDLE_DIR }}/
+          path: ${{ env.BUNDLE_DIR }}
           retention-days: 1
-
 
 # ── JOB 3 ── Lint ────────────────────────────────────────────────────────────
   lint:

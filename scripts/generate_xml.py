@@ -164,15 +164,14 @@ def quota_policy_xml() -> str:
     """Quota policy: apiproxy/policies/Quota-Default.xml"""
     return textwrap.dedent("""\
         <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-        <Quota name="Quota-Default" continueOnError="false" enabled="true" type="calendar">
+        <Quota name="Quota-Default" continueOnError="false" enabled="true">
             <DisplayName>Quota-Default</DisplayName>
-            <Allow count="3" countRef="request.header.allowed_quota"/>
-            <Interval ref="request.header.quota_count">1</Interval>
-            <TimeUnit ref="request.header.quota_timeout">minute</TimeUnit>
-            <StartTime>2024-01-01 00:00:00</StartTime>
+            <Allow count="3"/>
+            <Interval>1</Interval>
+            <TimeUnit>minute</TimeUnit>
             <Distributed>true</Distributed>
             <Synchronous>true</Synchronous>
-            <UseQuotaConfigInAPIProduct>step</UseQuotaConfigInAPIProduct>
+            <UseQuotaConfigInAPIProduct>true</UseQuotaConfigInAPIProduct>
         </Quota>
     """)
 

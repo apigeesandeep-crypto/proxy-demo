@@ -49,7 +49,7 @@ def proxy_endpoint_xml() -> str:
 
             <PreFlow name="PreFlow">
                 <Request>
-                    <Step>
+                    <Step name="Quota-Default">
                         <Name>Quota-Default</Name>
                     </Step>
                 </Request>
@@ -73,6 +73,7 @@ def proxy_endpoint_xml() -> str:
             </RouteRule>
         </ProxyEndpoint>
     """)
+
 
 
 def target_endpoint_xml() -> str:

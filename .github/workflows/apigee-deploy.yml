@@ -17,8 +17,7 @@ name: Apigee Proxy CI/CD – proxy-demo-1
 on:
   push:
     branches:
-      - main
-      - develop
+      - test
     paths:
       - 'apiproxy/**'
       - 'scripts/**'

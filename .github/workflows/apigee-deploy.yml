@@ -102,7 +102,7 @@ jobs:
             -s ${{ env.BUNDLE_DIR }}/apiproxy \
             -f table.js \
             --profile apigee \
-            --exitcode warn
+            --maxWarnings 10
           echo "==> Lint check completed."
 
       - name: Upload lint report

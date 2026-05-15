@@ -2,7 +2,7 @@
 """
 generate_xml.py
 Generates all required XML configuration files for the Apigee proxy-demo-1 bundle.
-Proxy enforces a single Quota policy on every inbound request.
+Proxy enforces a Quota policy (3 calls per minute).
 """
 
 import os
@@ -10,7 +10,6 @@ import sys
 import textwrap
 
 PROXY_NAME = "proxy-demo-1"
-
 
 # ─────────────────────────────────────────────
 # XML content definitions
@@ -22,7 +21,7 @@ def proxy_descriptor_xml() -> str:
         <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
         <APIProxy revision="1" name="{PROXY_NAME}">
             <DisplayName>{PROXY_NAME}</DisplayName>
-            <Description>Demo API Proxy with Quota enforcement, deployed via GitHub Actions</Description>
+            <Description>Demo API Proxy with Quota enforcement (3/min)</Description>
             <BasePaths>/{PROXY_NAME}</BasePaths>
             <Policies>
                 <Policy>Quota-Default</Policy>
@@ -36,17 +35,14 @@ def proxy_descriptor_xml() -> str:
         </APIProxy>
     """)
 
-
 def proxy_endpoint_xml() -> str:
     """Proxy endpoint: apiproxy/proxies/default.xml
-    Quota-Default is applied in the PreFlow so every request is checked
-    before it reaches the target, regardless of path or verb.
+    Fix for PO035: Added 'name' attribute to the <Step> tag.
     """
     return textwrap.dedent(f"""\
         <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
         <ProxyEndpoint name="default">
             <Description>Default Proxy Endpoint - Quota enforced on all requests</Description>
-
             <PreFlow name="PreFlow">
                 <Request>
                     <Step name="Quota-Default">
@@ -55,26 +51,19 @@ def proxy_endpoint_xml() -> str:
                 </Request>
                 <Response/>
             </PreFlow>
-
             <PostFlow name="PostFlow">
                 <Request/>
                 <Response/>
             </PostFlow>
-
             <Flows/>
-
             <HTTPProxyConnection>
                 <BasePath>/{PROXY_NAME}</BasePath>
-                <VirtualHost>secure</VirtualHost>
             </HTTPProxyConnection>
-
             <RouteRule name="default">
                 <TargetEndpoint>default</TargetEndpoint>
             </RouteRule>
         </ProxyEndpoint>
     """)
-
-
 
 def target_endpoint_xml() -> str:
     """Target endpoint: apiproxy/targets/default.xml"""
@@ -82,28 +71,15 @@ def target_endpoint_xml() -> str:
         <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
         <TargetEndpoint name="default">
             <Description>Default Target Endpoint</Description>
-
-            <PreFlow name="PreFlow">
-                <Request/>
-                <Response/>
-            </PreFlow>
-
-            <PostFlow name="PostFlow">
-                <Request/>
-                <Response/>
-            </PostFlow>
-
             <HTTPTargetConnection>
                 <URL>https://mocktarget.apigee.net</URL>
             </HTTPTargetConnection>
         </TargetEndpoint>
     """)
 
-
 def quota_policy_xml() -> str:
     """Quota policy: apiproxy/policies/Quota-Default.xml
-    Allows 1000 calls per month per client. Distributed + synchronous
-    ensures accurate counting across all Apigee instances.
+    Configured for 3 calls per 1 minute.
     """
     return textwrap.dedent("""\
         <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -114,13 +90,11 @@ def quota_policy_xml() -> str:
             <TimeUnit>minute</TimeUnit>
             <Distributed>true</Distributed>
             <Synchronous>true</Synchronous>
-            <UseQuotaConfigInAPIProduct>true</UseQuotaConfigInAPIProduct>
         </Quota>
     """)
 
-
 # ─────────────────────────────────────────────
-# File manifest  (only 4 files — no other policies)
+# File manifest
 # ─────────────────────────────────────────────
 
 FILE_MANIFEST = [
@@ -129,7 +103,6 @@ FILE_MANIFEST = [
     ("apiproxy/targets/default.xml",           target_endpoint_xml),
     ("apiproxy/policies/Quota-Default.xml",    quota_policy_xml),
 ]
-
 
 def write_files(base_path: str = ".") -> None:
     for relative_path, content_fn in FILE_MANIFEST:
@@ -140,13 +113,11 @@ def write_files(base_path: str = ".") -> None:
             fh.write(content)
         print(f"[OK] Written: {full_path}")
 
-
 def main():
     base_path = sys.argv[1] if len(sys.argv) > 1 else "."
     print(f"==> Generating XML files under: {os.path.abspath(base_path)}")
     write_files(base_path)
     print("==> XML generation complete.")
-
 
 if __name__ == "__main__":
     main()

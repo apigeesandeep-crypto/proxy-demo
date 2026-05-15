@@ -2,6 +2,7 @@
 """
 create_structure.py
 Creates the Apigee proxy folder scaffolding for proxy-demo-1.
+Matches the minimal structure required for a Quota-only proxy bundle.
 """
 
 import os
@@ -9,15 +10,12 @@ import sys
 
 PROXY_NAME = "proxy-demo-1"
 
-# Directory structure for an Apigee API proxy bundle
+# Only the directories needed for a Quota-only proxy bundle
 DIRECTORIES = [
-    f"apiproxy",
-    f"apiproxy/proxies",
-    f"apiproxy/targets",
-    f"apiproxy/policies",
-    f"apiproxy/resources",
-    f"apiproxy/resources/jsc",
-    f"apiproxy/resources/xsl",
+    "apiproxy",
+    "apiproxy/proxies",
+    "apiproxy/targets",
+    "apiproxy/policies",
 ]
 
 
@@ -33,8 +31,12 @@ def main():
     print(f"==> Scaffolding proxy bundle under: {os.path.abspath(base_path)}")
     create_directories(base_path)
     print("==> Directory scaffolding complete.")
+    print("")
+    print("    Folder structure:")
+    for directory in DIRECTORIES:
+        indent = "    " + ("    " * directory.count("/"))
+        print(f"{indent}└── {os.path.basename(directory)}/")
 
 
 if __name__ == "__main__":
     main()
-
